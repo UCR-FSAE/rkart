@@ -1,0 +1,35 @@
+# Copyright 2023 michael. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+pointcloud_to_laserscan:
+  ros__parameters:
+    transform_tolerance: 0.01
+    min_height: -10.0
+    max_height: 100.0
+    angle_min: -1.5708  # -M_PI/2
+    angle_max: 1.5708  # M_PI/2
+    angle_increment: 0.0087  # M_PI/360.0
+    scan_time: 0.3333
+    range_min: 0.45
+    range_max: 100.0
+    use_inf: true
+    inf_epsilon: 1.0
+
+/roar/costmap_node_manager:
+  ros__parameters:
+    use_sim_time: True
+    width: 10
+    height: 10
+    resolution: 1.0
+    loop_rate: 0.1
+    debug: True
+    footprint: "[[-0.5,-0.5],[-0.5,0.5],[0.5,0.5],[1.5,0.0],[0.5,-0.5]]"
+
+
+lifecycle_manager_costmap:
+  ros__parameters:
+    autostart: true
+    node_names: ["/roar/costmap_node_manager"]
+    use_sim_time: true
+    
+

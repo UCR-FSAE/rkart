@@ -1,0 +1,148 @@
+### COSTMAP ###
+pointcloud_to_laserscan:
+  ros__parameters:
+    min_height: 0.2
+    max_height: 10.0
+    angle_min: -1.5708  # -M_PI/2
+    angle_max: 1.5708  # M_PI/2
+    angle_increment: 0.0087  # M_PI/360.0
+    scan_time: 0.03
+    range_min: 1.0
+    range_max: 100.0
+    use_inf: True
+    inf_epsilon: 1.0
+    use_sim_time: false
+    
+lifecycle_manager_costmap:
+  ros__parameters:
+    autostart: true
+    node_names: ["/roar/costmap_node_manager"]
+    use_sim_time: False 
+
+/roar/costmap_node_manager:
+  ros__parameters:
+    width: 200
+    height: 100
+    resolution: 0.1
+    loop_rate: 0.05
+    inflation_radius: 2.0
+    inflation_cost_scaling: 0.01
+    debug: False
+
+/local_costmap/local_costmap_rclcpp_node:
+  ros__parameters:
+    use_sim_time: false
+### Global Planner ###
+/roar/global_planner_manager:
+  ros__parameters:
+    debug: false
+    planner_name: "RacePlanner"
+    planner_frequency: 0.1
+    
+    RacePlanner:
+      waypoint_path: "./src/launches/config/gokart/racing/waypoints.txt"
+
+
+/roar/lifecycle_manager_global_planning:
+  ros__parameters:
+    autostart: true
+    use_sim_time: false
+    node_names: ["/roar/global_planner_manager"]
+
+/roar/lifecycle_manager_map_server:
+  ros__parameters:
+    autostart: true
+    use_sim_time: false
+    node_names: ["/roar/map_server"]
+
+### Local Planner ###
+roar:
+  local_planner_manager_node:
+    ros__parameters:
+      manager:
+        debug: False
+        loop_rate: 0.05
+      use_sim_time: false
+      plugins: 
+        - "roar::planning::local::SimpleGreedyPlanner"
+      
+      SimpleDistancePlanner:
+        next_waypoint_dist: 2.0
+      RacingLinePerturbPlanner:
+        next_waypoint_dist: 10.0
+        obstacle_avoidance_init_distance: 0.5
+        obstacle_detection_distance: 10.0
+        obstacle_val: 100
+        should_use_best_effort_find_next_waypoint: true
+        debug: true
+      
+      SimpleGreedyPlanner:
+        debug: false
+        next_waypoint_dist: 10.0
+        max_iter: 20000
+lifecycle_manager_local_planning:
+  ros__parameters:
+    autostart: true
+    use_sim_time: false
+    node_names: ["/roar/local_planner_manager_node"]
+
+### behavior ### 
+/roar/behavior_planning_node:
+  ros__parameters:
+    debug: false
+    bt_xml_path: "./src/launches/config/carla/racing/behavior_tree.xml"
+/roar/lifecycle_manager_behavior_planning_node:
+  ros__parameters:
+    node_names: ["/roar/behavior_planning_node"]
+    autostart: true
+
+### Controller ###
+/roar/controller_manager:
+  ros__parameters:
+    use_sim_time: false
+    manager:
+      debug: false
+      loop_rate: 0.05
+
+    plugins:
+      - "roar::control::LatPIDControllerPlugin"
+      - "roar::control::DummyLonControllerPlugin"
+      - "roar::control::BehaviorControllerPlugin"
+
+    
+    lat_control:
+      pid:
+        kd: 0.1
+        ki: 0.1
+        kp: 1.0
+        max_cmd: 30.0
+        min_cmd: -30.0
+        max_i: 10.0
+        min_i: -10.0
+    lon_control:
+      target_speed: 5.0
+
+lifecycle_manager_controller:
+  ros__parameters:
+    autostart: true
+    use_sim_time: false
+    node_names: ["/roar/controller_manager"]
+
+lifecycle_manager_state_manager:
+  ros__parameters:
+    autostart: true
+    use_sim_time: false
+    node_names: ["/roar/vehicle_state_manager"]
+
+
+### Hardware ###
+/roar/pointone_nav_interface_node:
+  ros__parameters:
+    map_frame: map
+    base_link_frame: base_link
+    datum: "37.91479456,-122.3342746,0.0"
+    debug: False
+    use_sim_time: false
+    should_publish_transform: true
+    heading_offset_deg: 90.0
+    set_z_to_zero: true

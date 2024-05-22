@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<scenarios>
+    <scenario name="StationaryObstacle" type="StationaryObstacle" town="Town04">
+        <ego_vehicle x="11.90" y="4.70" z="0.5" yaw="90.0" model="vehicle.tesla.model3" />
+    </scenario>
+</scenarios>

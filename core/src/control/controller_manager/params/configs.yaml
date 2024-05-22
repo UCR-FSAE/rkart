@@ -1,0 +1,22 @@
+/**:
+    ros__parameters:
+      use_sim_time: true
+
+      manager:
+        debug: true
+        loop_rate: 30.0
+
+      base_link_frame: "base_link"
+      map_frame: "map"
+      lon_control:
+        trapezoidal:
+          accel_rate: 1.0
+      plugins:
+        - "roar::control::LatPIDControllerPlugin"
+        - "roar::control::DummyLonControllerPlugin"
+        
+lifecycle_manager_controller:
+  ros__parameters:
+    autostart: true
+    use_sim_time: true
+    node_names: ["/roar/controller_manager"]
